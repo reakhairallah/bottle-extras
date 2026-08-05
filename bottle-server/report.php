@@ -36,7 +36,7 @@ $array = $query->get_result();
 $row = $array->fetch_assoc();
 
 if($row["total"] >= 3) {
-    $sql = "UPDATE bottles SET is_active = 0 WHERE id = ?";
+    $sql = "UPDATE bottles SET is_active = 0, retirement_reason = 'reported' WHERE id = ?";
     $query = $mysql->prepare($sql);
     $query->bind_param("i", $bottle_id);
     $query->execute();

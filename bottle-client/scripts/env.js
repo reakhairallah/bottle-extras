@@ -1,1 +1,1 @@
-const BASE_URL = "http://localhost/bottle/bottle-server/";
+const BASE_URL = "http://localhost/bottle-extras/bottle-server/";

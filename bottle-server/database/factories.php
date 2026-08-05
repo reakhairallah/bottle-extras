@@ -58,7 +58,26 @@ $bottles = [
     ["content" => "I've had the same ringtone since 2014 and I refuse to change it.", "marks" => ["some things shouldn't change, honestly", "at least you always know it's your phone"]],
     ["content" => "I remembered an embarrassing thing I did in middle school at 2am for no reason.", "marks" => ["the 2am memory ambush is brutal"]],
     ["content" => "I finally tried the recipe I bookmarked a year ago and it actually turned out great.", "marks" => ["a year is basically right on schedule", "so proud of past you for bookmarking it"]],
-    ["content" => "I let myself rest today without feeling guilty about it and it felt like a small victory.", "marks" => ["rest is productive too, good for you"]]
+    ["content" => "I let myself rest today without feeling guilty about it and it felt like a small victory.", "marks" => ["rest is productive too, good for you"]],
+    ["content" => "I still flinch a little every time my phone rings unexpectedly.", "marks" => ["caller id ruined phone calls for everyone", "same, unknown numbers are a whole event", "answering unprepared should be an olympic sport"]],
+    ["content" => "I finally beat the level I'd been stuck on for a week and yelled loud enough to scare the cat.", "marks" => ["the cat forgives you eventually", "that victory was earned", "worth every bit of the noise"]],
+    ["content" => "I told the barista my name wrong just to see what they'd write on the cup.", "marks" => ["chaotic but valid", "i need to see what they wrote", "this is a bit i respect"]],
+    ["content" => "I've had a half-finished puzzle on my table for three weeks and I walk past it like it's furniture.", "marks" => ["it's decor now, accept it", "puzzles are a long term commitment", "no rush, it'll get there"]],
+    ["content" => "I said 'happy birthday' to a coworker whose birthday was actually next month.", "marks" => ["the sentiment still counts", "early well wishes are still well wishes", "hope they were kind about it"]],
+    ["content" => "I finally learned how to parallel park properly and I've told everyone I know.", "marks" => ["a milestone worth announcing honestly", "genuinely underrated skill", "proud of you, seriously"]],
+    ["content" => "I keep a running list of words I like the sound of and no real reason for it.", "marks" => ["this is such a nice thing to collect", "i want to see the list", "words deserve appreciation too"]],
+    ["content" => "I pretended to be on a call to avoid a conversation in the elevator.", "marks" => ["the elevator is a battlefield", "we've all needed this escape route", "no shame, survival instincts"]],
+    ["content" => "I finally understood a joke from months ago and laughed out loud alone in my room.", "marks" => ["delayed laughter is still laughter", "this happens to me constantly", "hope it was worth the wait"]],
+    ["content" => "I've rearranged my furniture four times this year looking for a layout that feels right.", "marks" => ["the search continues, respect the process", "furniture feng shui is real", "let us know when you find it"]],
+    ["content" => "I said 'I'm never doing that again' and then did it again a week later.", "marks" => ["a timeless personal tradition", "we've all broken this promise", "no judgment, it happens"]],
+    ["content" => "I finally sent the email I'd been drafting for two weeks and immediately felt lighter.", "marks" => ["that relief is unmatched", "so glad you sent it", "the draft folder loses one more hostage"]],
+    ["content" => "I still remember the exact smell of my grandparents' house even though it's been years.", "marks" => ["smell memories are the strongest ones", "this made me think of mine too", "that's a beautiful thing to still carry"]],
+    ["content" => "I bought a plant specifically because I liked the pot and I'm not sorry about it.", "marks" => ["valid purchasing strategy", "the pot deserved it honestly", "no regrets is the right attitude"]],
+    ["content" => "I practiced a hard conversation in the shower and somehow still froze when it actually happened.", "marks" => ["the shower version is always braver", "this happens to the best of us", "hope the real conversation went okay anyway"]],
+    ["content" => "I've kept the same wallpaper on my phone for four years because changing it feels like too big a decision.", "marks" => ["some decisions deserve that much caution", "the wallpaper has earned tenure at this point", "i respect the commitment"]],
+    ["content" => "I told a stranger they dropped something just so I'd have an excuse to talk to them.", "marks" => ["bold and resourceful honestly", "did it work", "this is secretly kind of sweet"]],
+    ["content" => "I finally finished the book I'd restarted four times and cried at the ending.", "marks" => ["fourth time's the charm apparently", "good endings deserve real tears", "so glad you finally got there"]],
+    ["content" => "I still can't throw away the birthday cards from people who aren't around anymore.", "marks" => ["you don't have to, ever", "those are worth keeping", "this really got me, sending you warmth"]]
 ];
 
 ?>

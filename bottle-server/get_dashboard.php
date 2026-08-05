@@ -1,6 +1,7 @@
 <?php
 
 include("database/token.php");
+include("database/retirement.php");
 
 $user_id = $current_user["id"];
 
@@ -36,6 +37,20 @@ while($bottle = $array->fetch_assoc()) {
         $marks[] = $mark["content"];
     }
     $bottle["marks"] = $marks;
+
+    // lazy retirement check: this bottle's is_active flag can be stale
+    // if nothing has touched it since it became due - if it's due now,
+    // retire it and leave it out of this response, since it's no
+    // longer circulating (it'll show up in the archive instead)
+    $retirement_reason = determine_retirement_reason($bottle, count($marks));
+
+    if($retirement_reason !== null){
+        $sql = "UPDATE bottles SET is_active = 0, retirement_reason = ? WHERE id = ?";
+        $query = $mysql->prepare($sql);
+        $query->bind_param("si", $retirement_reason, $bottle_id);
+        $query->execute();
+        continue;
+    }
 
     $response["data"][] = $bottle;
 }
