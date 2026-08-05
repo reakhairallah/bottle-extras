@@ -27,9 +27,11 @@ if($current_user == null) {
     $noun = $nouns[rand(0, count($nouns) - 1)];
     $display_name = $adjective . $noun . rand(1, 99);
 
-    $sql = "INSERT INTO users(token, display_name) VALUES(?, ?)";
+    $seed = mt_rand(1, 2147483647);
+
+    $sql = "INSERT INTO users(token, display_name, seed) VALUES(?, ?, ?)";
     $query = $mysql->prepare($sql);
-    $query->bind_param("ss", $token, $display_name);
+    $query->bind_param("ssi", $token, $display_name, $seed);
     $query->execute();
 
     setcookie("bottle_token", $token, time() + (60 * 60 * 24 * 365), "/");

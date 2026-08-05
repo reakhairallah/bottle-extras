@@ -37,9 +37,11 @@ if($row["total"] >= 3){
     exit;
 }
 
-$sql = "INSERT INTO bottles(author_id, content) VALUES(?, ?)";
+$seed = mt_rand(1, 2147483647);
+
+$sql = "INSERT INTO bottles(author_id, content, seed) VALUES(?, ?, ?)";
 $query = $mysql->prepare($sql);
-$query->bind_param("is", $author_id, $content);
+$query->bind_param("isi", $author_id, $content, $seed);
 $query->execute();
 
 $response = [];

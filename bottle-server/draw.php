@@ -2,6 +2,7 @@
 
 include("database/token.php");
 include("database/retirement.php");
+include("database/position.php");
 
 $user_id = $current_user["id"];
 
@@ -35,51 +36,109 @@ if($row["total"] >= 3){
     exit;
 }
 
-// candidate selection is wrapped in a retry loop: a bottle's is_active
-// flag can be stale (nothing has touched it since it became eligible
-// for retirement), so each candidate gets a lazy retirement check
-// before it's served. If it turns out to be due for retirement, it's
-// retired on the spot and we go pick another candidate instead - the
-// pool shrinks by one retired bottle each time this happens, so the
-// loop always terminates.
-while(true){
-    $sql = "SELECT * FROM bottles
-            WHERE is_active = 1
-            AND author_id != ?
-            AND id NOT IN (SELECT bottle_id FROM holds WHERE user_id = ?)
-            ORDER BY RAND()
-            LIMIT 1";
-    $query = $mysql->prepare($sql);
-    $query->bind_param("ii", $user_id, $user_id);
-    $query->execute();
-    $array = $query->get_result();
-    $bottle = $array->fetch_assoc();
+// the drawing user's own current virtual position, needed for the
+// proximity factor below
+$user_age_days = get_age_days($current_user["created_at"]);
+$user_pos = get_position($current_user["seed"], $user_age_days);
 
-    if($bottle == null){
-        $response = [];
-        $response["success"] = false;
-        $response["message"] = "No bottles available to draw right now!";
-        echo json_encode($response);
-        exit;
-    }
+// fetch every bottle eligible to be drawn by this user - same base
+// filter as before (active, not their own, not already held by them)
+$sql = "SELECT * FROM bottles
+        WHERE is_active = 1
+        AND author_id != ?
+        AND id NOT IN (SELECT bottle_id FROM holds WHERE user_id = ?)";
+$query = $mysql->prepare($sql);
+$query->bind_param("ii", $user_id, $user_id);
+$query->execute();
+$raw_candidates = $query->get_result()->fetch_all(MYSQLI_ASSOC);
+
+// build the real candidate pool: lazy-retire anything due (same check
+// as before, just done for every fetched bottle up front instead of
+// one at a time), and compute each survivor's scoring inputs
+$candidates = [];
+foreach($raw_candidates as $bottle){
+    $bottle_id = $bottle["id"];
 
     $sql = "SELECT COUNT(*) AS total FROM marks WHERE bottle_id = ?";
     $query = $mysql->prepare($sql);
-    $query->bind_param("i", $bottle["id"]);
+    $query->bind_param("i", $bottle_id);
     $query->execute();
-    $mark_count = $query->get_result()->fetch_assoc()["total"];
+    $mark_count = (int)$query->get_result()->fetch_assoc()["total"];
 
-    $retirement_reason = determine_retirement_reason($bottle, (int)$mark_count);
+    $retirement_reason = determine_retirement_reason($bottle, $mark_count);
 
     if($retirement_reason !== null){
         $sql = "UPDATE bottles SET is_active = 0, retirement_reason = ? WHERE id = ?";
         $query = $mysql->prepare($sql);
-        $query->bind_param("si", $retirement_reason, $bottle["id"]);
+        $query->bind_param("si", $retirement_reason, $bottle_id);
         $query->execute();
         continue;
     }
 
-    break;
+    $sql = "SELECT COUNT(*) AS total FROM holds WHERE bottle_id = ?";
+    $query = $mysql->prepare($sql);
+    $query->bind_param("i", $bottle_id);
+    $query->execute();
+    $hold_count = (int)$query->get_result()->fetch_assoc()["total"];
+
+    $bottle_age_days = get_age_days($bottle["created_at"]);
+    $bottle_pos = get_position($bottle["seed"], $bottle_age_days);
+    $distance = get_distance($user_pos, $bottle_pos);
+
+    $reference = $bottle["last_mark_at"] !== null ? $bottle["last_mark_at"] : $bottle["created_at"];
+    $neglect_days = min(get_age_days($reference), 30);
+
+    $candidates[] = [
+        "bottle" => $bottle,
+        "hold_count" => $hold_count,
+        "mark_count" => $mark_count,
+        "neglect_days" => $neglect_days,
+        "distance" => $distance,
+    ];
+}
+
+if(count($candidates) == 0){
+    $response = [];
+    $response["success"] = false;
+    $response["message"] = "No bottles available to draw right now!";
+    echo json_encode($response);
+    exit;
+}
+
+// rarity and proximity are both relative to this candidate pool, so
+// they need the pool's bounds before they can be computed
+$max_hold_count = max(array_column($candidates, "hold_count"));
+$max_distance = max(array_column($candidates, "distance"));
+
+$total_score = 0;
+foreach($candidates as &$c){
+    $rarity = $max_hold_count > 0 ? 1 - ($c["hold_count"] / $max_hold_count) : 1;
+    $neglect = $c["neglect_days"] / 30;
+    $marks_factor = (3 - $c["mark_count"]) / 3;
+    $proximity = $max_distance > 0 ? 1 - ($c["distance"] / $max_distance) : 1;
+
+    $c["score"] = 0.3 * $rarity + 0.3 * $neglect + 0.3 * $proximity + 0.1 * $marks_factor;
+    $total_score += $c["score"];
+}
+unset($c);
+
+// weighted-random pick: walk the candidates, subtracting each one's
+// score from a random point along the total until it goes negative -
+// a bottle with double the score of another is twice as likely to be
+// picked here, but never guaranteed (roulette-wheel selection)
+$target = $total_score > 0 ? (mt_rand() / mt_getrandmax()) * $total_score : 0;
+$bottle = null;
+foreach($candidates as $c){
+    $target -= $c["score"];
+    if($target <= 0){
+        $bottle = $c["bottle"];
+        break;
+    }
+}
+// floating-point safety net - should only trigger if every score was
+// exactly 0, in which case any candidate is as good as any other
+if($bottle === null){
+    $bottle = end($candidates)["bottle"];
 }
 
 $bottle_id = $bottle["id"];
