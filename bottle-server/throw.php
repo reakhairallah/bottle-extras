@@ -20,6 +20,27 @@ if(trim($content) === ""){
     exit;
 }
 
+// unlocks_at is optional - most throws leave it out entirely, meaning
+// an ordinary, unsealed bottle. If one is submitted, it has to parse
+// to a real date and land strictly in the future; anything else
+// (garbage input, a past date, "right now") is a hard reject rather
+// than silently dropping what the user typed
+$unlocks_at = null;
+
+if(isset($_POST["unlocks_at"]) && trim($_POST["unlocks_at"]) !== ""){
+    $unlocks_at_ts = strtotime($_POST["unlocks_at"]);
+
+    if($unlocks_at_ts === false || $unlocks_at_ts <= time()){
+        $response = [];
+        $response["success"] = false;
+        $response["message"] = "Unlock date must be in the future!";
+        echo json_encode($response);
+        exit;
+    }
+
+    $unlocks_at = date("Y-m-d H:i:s", $unlocks_at_ts);
+}
+
 $author_id = $current_user["id"];
 
 $sql = "SELECT COUNT(*) AS total FROM bottles WHERE author_id = ? AND created_at >= CURDATE()";
@@ -39,9 +60,9 @@ if($row["total"] >= 3){
 
 $seed = mt_rand(1, 2147483647);
 
-$sql = "INSERT INTO bottles(author_id, content, seed) VALUES(?, ?, ?)";
+$sql = "INSERT INTO bottles(author_id, content, seed, unlocks_at) VALUES(?, ?, ?, ?)";
 $query = $mysql->prepare($sql);
-$query->bind_param("isi", $author_id, $content, $seed);
+$query->bind_param("isis", $author_id, $content, $seed, $unlocks_at);
 $query->execute();
 
 $response = [];

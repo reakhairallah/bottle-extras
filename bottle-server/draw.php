@@ -42,11 +42,15 @@ $user_age_days = get_age_days($current_user["created_at"]);
 $user_pos = get_position($current_user["seed"], $user_age_days);
 
 // fetch every bottle eligible to be drawn by this user - same base
-// filter as before (active, not their own, not already held by them)
+// filter as before (active, not their own, not already held by them),
+// plus a hard exclusion for still-sealed time capsules: unlike
+// proximity, a future unlocks_at doesn't just bias the odds, it makes
+// the bottle genuinely undrawable until that moment passes
 $sql = "SELECT * FROM bottles
         WHERE is_active = 1
         AND author_id != ?
-        AND id NOT IN (SELECT bottle_id FROM holds WHERE user_id = ?)";
+        AND id NOT IN (SELECT bottle_id FROM holds WHERE user_id = ?)
+        AND (unlocks_at IS NULL OR unlocks_at <= NOW())";
 $query = $mysql->prepare($sql);
 $query->bind_param("ii", $user_id, $user_id);
 $query->execute();
