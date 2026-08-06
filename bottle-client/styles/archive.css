@@ -108,6 +108,23 @@ body {
   pointer-events: none;
 }
 
+/* the pill only wraps the status word itself (.status-tag, shared from
+   components.css) - the mark count sits next to it as plain text
+   instead of inside the pill, so the tag doesn't stretch to fit a
+   whole "Completed · 3 marks" string. Used both on the grid card and
+   the expanded paper's own status row. */
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.status-meta {
+  font-size: 12.5px;
+  color: rgba(6, 40, 44, 0.55);
+  font-variant-numeric: tabular-nums;
+}
+
 .card-message {
   position: relative;
   font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;

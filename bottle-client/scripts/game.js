@@ -427,6 +427,8 @@ function openPaper(bottleCenterX, bottleCenterY, bottleHeight, bottle, marks){
     });
 
     markTextarea.value = "";
+    markTextarea.disabled = false;
+    markTextarea.placeholder = "Leave a mark...";
     markCharCount.textContent = "0";
     postBtn.disabled = false;
 
@@ -494,15 +496,25 @@ postBtn.addEventListener("click", () => {
         return;
     }
 
+    const content = markTextarea.value;
     postBtn.disabled = true;
     const body = new URLSearchParams();
     body.append("bottle_id", currentBottleId);
-    body.append("content", markTextarea.value);
+    body.append("content", content);
 
     axios.post(BASE_URL + "mark.php", body).then((response) => {
         if(response.data.success){
             showToast("success", response.data.message);
-            releaseBottle();
+            // stay on the modal instead of auto-closing - the user should
+            // see their mark actually land and decide for themselves when
+            // to leave, same as clicking Close always has. Only one mark
+            // per user per bottle (enforced server-side), so the field
+            // goes read-only rather than resetting for another attempt.
+            paperMarks.appendChild(createMarkElement(content, "paper-mark"));
+            markTextarea.value = "";
+            markTextarea.disabled = true;
+            markTextarea.placeholder = "You've already left a mark on this bottle.";
+            markCharCount.textContent = "0";
         } else {
             postBtn.disabled = false;
             showToast("error", response.data.message);
@@ -659,7 +671,7 @@ throwSubmitBtn.addEventListener("click", () => {
         if(response.data.success){
             const wasSealed = sealed;
             closeThrowModal();
-            showToast("success", wasSealed ? "Bottle sealed and set adrift." : "Your bottle is adrift.");
+            showToast("success", wasSealed ? "Bottle sealed." : "Your bottle is adrift.");
             // immediate refresh, same reasoning as the draw side above -
             // a newly-thrown bottle can now show up as someone else's
             // candidate without waiting for the next 90s poll

@@ -313,7 +313,9 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  /* was 14px - the modal comfortably fits 2-3 marks (the hard max),
+     no need to cram them together */
+  gap: 26px;
 }
 /* plain text, no box/card/border/shadow - a bordered mark read as "a
    website component," undermining the paper metaphor. Just separate
@@ -342,6 +344,14 @@
   font-size: 13px;
   font-family: inherit;
   color: var(--ink);
+}
+/* once a mark's been posted (one per user per bottle, enforced
+   server-side), the field goes read-only rather than disappearing -
+   same "stay put, let the user decide when to leave" reasoning as not
+   auto-closing the modal on a successful post */
+.paper-textarea:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .paper-actions {

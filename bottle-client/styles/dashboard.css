@@ -125,7 +125,10 @@ body {
     radial-gradient(140% 100% at 85% 100%, rgba(120, 95, 55, 0.1), transparent 55%);
   pointer-events: none;
 }
-.popover.paper .popover-content { padding: 22px 20px 20px 44px; }
+/* right/bottom padding bumped from 20px - the Close button (align-self:
+   flex-end, no margin of its own) sat flush against that edge, reading
+   as cramped against the torn-paper edge on the right */
+.popover.paper .popover-content { padding: 22px 26px 24px 44px; }
 .popover.paper .popover-message {
   font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
   font-size: 16.5px; line-height: 1.55; color: var(--ink);

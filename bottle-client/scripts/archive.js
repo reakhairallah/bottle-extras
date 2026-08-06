@@ -1,11 +1,41 @@
 const grid = document.getElementById("grid");
 const counts = document.getElementById("counts");
 
-function tagText(bottle){
+// split from the old single tagText() string so the pill can wrap just
+// the status word - the mark count sits next to it as plain text
+// instead of being inside (and widening) the pill
+function statusLabel(bottle){
+    return bottle.retirement_reason === "completed" ? "Completed" : "Neglected";
+}
+
+function marksCountText(bottle){
     const n = bottle.marks.length;
-    return bottle.retirement_reason === "completed"
-        ? `Completed · ${n} marks`
-        : `Neglected${n ? ` · ${n} mark${n === 1 ? "" : "s"}` : ""}`;
+    if(n === 0) return ""; // a freshly-neglected bottle can have 0 marks - nothing to show
+    return `${n} mark${n === 1 ? "" : "s"}`;
+}
+
+// builds <span class="status-tag ...">Label</span> + an optional plain-
+// text mark count next to it, wrapped in one inline row
+function buildStatusRow(bottle, tagId, metaId){
+    const row = document.createElement("div");
+    row.className = "status-row";
+
+    const tag = document.createElement("span");
+    tag.className = `status-tag ${bottle.retirement_reason}`;
+    tag.textContent = statusLabel(bottle);
+    if(tagId) tag.id = tagId;
+    row.appendChild(tag);
+
+    const marksText = marksCountText(bottle);
+    if(marksText){
+        const meta = document.createElement("span");
+        meta.className = "status-meta";
+        meta.textContent = marksText;
+        if(metaId) meta.id = metaId;
+        row.appendChild(meta);
+    }
+
+    return row;
 }
 
 axios.get(BASE_URL + "get_archive.php").then((response) => {
@@ -35,10 +65,7 @@ axios.get(BASE_URL + "get_archive.php").then((response) => {
         message.textContent = bottle.content;
         card.appendChild(message);
 
-        const tag = document.createElement("span");
-        tag.className = `status-tag ${bottle.retirement_reason}`;
-        tag.textContent = tagText(bottle);
-        card.appendChild(tag);
+        card.appendChild(buildStatusRow(bottle));
 
         card.addEventListener("click", () => expandCard(card, bottle));
         card.addEventListener("keydown", (e) => {
@@ -66,7 +93,7 @@ const backdrop = document.getElementById("backdrop");
 const paper = document.getElementById("paper");
 const paperMessage = document.getElementById("paper-message");
 const paperMarks = document.getElementById("paper-marks");
-const paperTag = document.getElementById("paper-tag");
+const paperStatusRow = document.getElementById("paper-status-row");
 const paperClose = document.getElementById("paper-close");
 
 let activeCard = null;
@@ -78,8 +105,8 @@ function expandCard(card, bottle){
     const rect = card.getBoundingClientRect();
 
     paperMessage.textContent = bottle.content;
-    paperTag.className = `status-tag ${bottle.retirement_reason}`;
-    paperTag.textContent = tagText(bottle);
+    paperStatusRow.innerHTML = "";
+    paperStatusRow.appendChild(buildStatusRow(bottle));
     paperMarks.innerHTML = "";
     if(bottle.marks.length === 0){
         const none = document.createElement("div");
