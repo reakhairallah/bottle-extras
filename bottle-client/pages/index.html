@@ -4,64 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bottle</title>
-    <link rel="stylesheet" href="../styles/style.css">
+    <link rel="stylesheet" href="../styles/tokens.css">
+    <link rel="stylesheet" href="../styles/components.css">
+    <link rel="stylesheet" href="../styles/landing.css">
 </head>
 <body>
 
-    <nav class="top-bar">
-        <a href="dashboard.html" class="icon-btn" id="profile-btn" aria-label="Your dashboard">👤</a>
-        <h2 id="welcome-msg">Welcome</h2>
-        <button class="icon-btn" id="add-btn" aria-label="Throw a bottle">✚</button>
-    </nav>
+    <div class="scene">
+        <div class="sun-halo"></div>
+        <div class="sun-core"></div>
 
-    <main class="bottle-grid">
-        <button class="bottle-card"></button>
-        <button class="bottle-card"></button>
-        <button class="bottle-card"></button>
-        <button class="bottle-card"></button>
-        <button class="bottle-card"></button>
-        <button class="bottle-card"></button>
-    </main>
+        <svg class="cloud cloud-a" viewBox="0 0 200 100" aria-hidden="true">
+            <ellipse cx="100" cy="70" rx="86" ry="24" /><circle cx="72" cy="46" r="32" /><circle cx="128" cy="44" r="30" />
+        </svg>
+        <svg class="cloud cloud-b" viewBox="0 0 200 100" aria-hidden="true">
+            <ellipse cx="100" cy="70" rx="80" ry="22" /><circle cx="98" cy="42" r="32" />
+        </svg>
+        <svg class="cloud cloud-c" viewBox="0 0 200 100" aria-hidden="true">
+            <ellipse cx="100" cy="70" rx="82" ry="22" /><circle cx="88" cy="44" r="30" /><circle cx="136" cy="48" r="24" />
+        </svg>
+        <svg class="cloud cloud-d" viewBox="0 0 200 100" aria-hidden="true">
+            <ellipse cx="100" cy="70" rx="78" ry="22" /><circle cx="104" cy="44" r="30" />
+        </svg>
 
-    <!-- THROW MODAL -->
+        <div class="bird bird-1"><svg width="16" height="6" viewBox="0 0 16 6" aria-hidden="true"><path d="M1 5 Q8 0.5 15 5" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" /></svg></div>
+        <div class="bird bird-2"><svg width="16" height="6" viewBox="0 0 16 6" aria-hidden="true"><path d="M1 5 Q8 0.5 15 5" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" /></svg></div>
+        <div class="bird bird-3"><svg class="bird-flap" width="16" height="6" viewBox="0 0 16 6" aria-hidden="true"><path d="M1 5 Q8 0.5 15 5" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" /></svg></div>
+        <div class="bird bird-4"><svg class="bird-flap" width="13" height="5" viewBox="0 0 16 6" aria-hidden="true"><path d="M1 5 Q8 0.5 15 5" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" /></svg></div>
 
-    <div class="modal-backdrop hidden" id="throw-modal">
-        <div class="modal-box">
-            <h2>Throw a bottle</h2>
-            <textarea class="text-input" id="throw-textarea" maxlength="255" placeholder="Write your message..."></textarea>
-            <p class="char-num"><span id="throw-char-count">0</span>/255</p>
-            <div class="modal-actions">
-                <button class="cancel-btn" id="cancel-btn">Cancel</button>
-                <button class="submit-btn" id="throw-btn">Throw</button>
-            </div>
+        <canvas id="ocean"></canvas>
+    </div>
+
+    <div class="scrim"></div>
+
+    <div class="panel">
+        <div class="wordmark">
+            <h1>Bottle</h1>
+            <p>Write something you'd never say out loud. Set it adrift. Maybe someone finds it.</p>
+        </div>
+        <div class="buttons">
+            <a class="cta cta-primary" href="game.html">Play the Game</a>
+            <a class="cta cta-secondary" href="archive.html">Browse the Archive</a>
         </div>
     </div>
 
-    <!--DRAW MODAL-->
-
-    <div class="modal-backdrop hidden" id="draw-modal">
-        <div class="modal-box">
-            <p class="bottle-content" id="bottle-content">This is the bottle's message text.</p>
-
-            <div class="marks-list" id="marks-list">
-                <p class="mark">a line someone left</p>
-                <p class="mark">another line</p>
-            </div>
-
-            <textarea class="text-input" id="mark-textarea" maxlength="100" placeholder="Leave a mark..."></textarea>
-            <p class="char-num"><span id="mark-char-count">0</span>/100</p>
-
-            <div class="modal-actions">
-                <button id="report-btn">⚠︎ Report</button>
-                <button class="cancel-btn" id="close-bottle-btn">Close</button>
-                <button class="submit-btn" id="post-mark-btn">Post</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="../scripts/axios.min.js"></script>
-    <script src="../scripts/env.js"></script>
-    <script src="../scripts/helpers.js"></script>
-    <script src="../scripts/app.js"></script>
+    <script src="../scripts/landing.js"></script>
 </body>
 </html>
