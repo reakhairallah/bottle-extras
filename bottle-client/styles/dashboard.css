@@ -1,0 +1,252 @@
+/* ============================================================
+   DASHBOARD PAGE (dashboard.html) - page-specific only.
+   Nav pill (.nav-bar.compact), backdrop material language, status
+   tags, and mark-list typography (.paper-marks-label/.paper-marks/
+   .paper-mark - identical values, reused directly rather than
+   redefined as .card-marks-label etc.) all come from components.css.
+   ============================================================ */
+
+html, body {
+  min-height: 100%;
+}
+
+body {
+  position: relative;
+  background: linear-gradient(180deg, var(--sky-high) 0%, var(--sky-horizon) 40%, var(--water-shallow) 42%, var(--water-deep) 100%);
+}
+
+/* ================= SCENE ================= */
+.scene { position: fixed; inset: -20px; filter: blur(15px); z-index: 0; }
+.scrim {
+  position: fixed; inset: 0; z-index: 0;
+  background: radial-gradient(140% 100% at 50% 0%, rgba(6, 40, 44, 0.08), rgba(6, 40, 44, 0.28) 100%);
+  pointer-events: none;
+}
+
+.nav-bar { position: fixed; top: 20px; left: 20px; z-index: 20; }
+
+/* ================= POPOVER (shared shell for Shelf + Sealed) =================
+   Grows from the clicked nav button's own rect, same idea as the
+   archive's card-to-modal expansion: only position/size transition.
+   Glass material (this is chrome, not message content) EXCEPT when
+   showing the kept bottle itself, which swaps to the paper treatment -
+   see .popover.paper. Sized to its own MEASURED content height (see
+   dashboard.js openPopoverFrom) - a first pass guessed fixed heights
+   and left a visible scrollbar on content that actually fit. */
+.popover-backdrop {
+  position: fixed; inset: 0; z-index: 24;
+  background: transparent;
+  opacity: 0; pointer-events: none;
+}
+.popover-backdrop.open { opacity: 1; pointer-events: auto; }
+
+.popover {
+  position: fixed; z-index: 25;
+  border-radius: 22px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    left 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    top 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.2s ease;
+}
+.popover.open { opacity: 1; pointer-events: auto; }
+
+.popover.glass {
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: 0 12px 32px rgba(6, 40, 44, 0.22);
+}
+
+.popover-content {
+  position: absolute; inset: 0;
+  padding: 22px 24px;
+  display: flex; flex-direction: column; gap: 12px;
+  opacity: 0;
+  transition: opacity 0.25s ease 0.2s;
+  overflow-y: auto;
+}
+.popover.open .popover-content { opacity: 1; }
+
+.popover-title { font-size: 15px; font-weight: 700; color: var(--ink); }
+.popover-text { font-size: 13.5px; line-height: 1.55; color: rgba(6, 40, 44, 0.75); }
+.popover-cta {
+  align-self: flex-start; margin-top: 4px;
+  border: none; border-radius: 999px; cursor: pointer;
+  padding: 10px 18px; font-size: 13px; font-weight: 600;
+  background: var(--ink); color: var(--paper);
+  transition: background 0.15s ease;
+}
+.popover-cta:hover { background: #0a3a3f; }
+
+.sealed-row {
+  display: flex; justify-content: space-between; gap: 12px;
+  font-size: 13px; padding: 8px 0;
+  border-bottom: 1px solid rgba(6, 40, 44, 0.1);
+}
+.sealed-row:last-child { border-bottom: none; }
+.sealed-row .when { color: rgba(6, 40, 44, 0.55); font-variant-numeric: tabular-nums; }
+
+/* the "expands into the kept bottle" state - own torn-edge/mask (own
+   #dash-card-holes, distinct from the archive's #card-holes and the
+   canonical #paper-holes - card proportions differ enough that sharing
+   one mask would read as slightly elliptical holes), same idea as the
+   grid card below. */
+.popover.paper {
+  background: linear-gradient(155deg, #fbf8f0 0%, #f6f1e2 45%, #ece3cd 100%);
+  clip-path: polygon(
+    0% 0%, 100% 0%, 100% 100%, 0% 100%,
+    4% 92%, 0.5% 84%, 3.5% 76%, 1% 68%, 4% 60%, 0% 52%, 3.5% 44%, 1% 36%, 4% 28%, 0.5% 20%, 3.5% 12%, 1% 5%
+  );
+  mask-image: url(#dash-card-holes);
+  -webkit-mask-image: url(#dash-card-holes);
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  filter: drop-shadow(0 18px 40px rgba(6, 22, 26, 0.35));
+  border-radius: 0;
+}
+.popover.paper::before {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(90deg, transparent calc(15% - 1px), rgba(196, 90, 92, 0.4) calc(15% - 1px), rgba(196, 90, 92, 0.4) 15%, transparent 15%),
+    radial-gradient(120% 90% at 15% 0%, rgba(255, 255, 255, 0.55), transparent 55%),
+    radial-gradient(140% 100% at 85% 100%, rgba(120, 95, 55, 0.1), transparent 55%);
+  pointer-events: none;
+}
+.popover.paper .popover-content { padding: 22px 20px 20px 44px; }
+.popover.paper .popover-message {
+  font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+  font-size: 16.5px; line-height: 1.55; color: var(--ink);
+}
+.popover-close {
+  align-self: flex-end; margin-top: auto;
+  border: none; background: none; color: rgba(6, 40, 44, 0.6);
+  font-size: 13px; text-decoration: underline; cursor: pointer;
+}
+
+/* ================= SELECTION MODE BANNER ================= */
+.select-banner {
+  position: fixed; top: 20px; left: 50%; z-index: 22;
+  transform: translate(-50%, -140%);
+  opacity: 0;
+  pointer-events: none;
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(10px) saturate(140%);
+  box-shadow: 0 8px 24px rgba(6, 40, 44, 0.2);
+  font-size: 13px; font-weight: 600; color: var(--ink);
+  white-space: nowrap;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+}
+/* opacity is what actually guarantees invisibility - the transform
+   alone (translateY(-140%) of the element's OWN height) is a fragile
+   way to hide something, since it depends on the exact rendered height
+   being calculated correctly. A small variance there previously left a
+   sliver of this banner visible at the top of the screen even when
+   "closed" - caught via devtools, not visible in every browser/zoom
+   level, which is exactly the kind of bug percentage-based hiding
+   produces. Every other hide/show element in this app (.backdrop,
+   .paper, .toast) already pairs opacity with its position/transform
+   for this reason; this one didn't. */
+.select-banner.open { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
+.select-banner button {
+  border: none; background: none; color: rgba(6, 40, 44, 0.6);
+  font-size: 13px; font-weight: 600; text-decoration: underline; cursor: pointer;
+}
+
+/* ================= PAGE HEADER ================= */
+.page-header {
+  position: relative; z-index: 5;
+  padding: 108px 6vw 8px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.page-header h1 { font-size: clamp(26px, 4vw, 34px); font-weight: 700; text-shadow: 0 2px 16px rgba(255, 255, 255, 0.4); }
+.page-header p { font-size: 13.5px; color: rgba(6, 40, 44, 0.75); text-shadow: 0 1px 10px rgba(255, 255, 255, 0.35); font-variant-numeric: tabular-nums; }
+
+/* ================= CARD GRID ================= */
+/* wider minimum than the archive's cards - everything shows inline
+   here (no click-to-expand), so cards need more room; the user's own
+   bottle count is small ("yours", not "everyone's"), so the extra
+   space per card is the right trade */
+.grid {
+  position: relative; z-index: 5;
+  padding: 20px 6vw 80px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 34px 26px;
+}
+
+.card {
+  position: relative;
+  background: linear-gradient(155deg, #fbf8f0 0%, #f6f1e2 45%, #ece3cd 100%);
+  clip-path: polygon(
+    0% 0%, 100% 0%, 100% 100%, 0% 100%,
+    4% 92%, 0.5% 84%, 3.5% 76%, 1% 68%, 4% 60%, 0% 52%, 3.5% 44%, 1% 36%, 4% 28%, 0.5% 20%, 3.5% 12%, 1% 5%
+  );
+  mask-image: url(#dash-card-holes);
+  -webkit-mask-image: url(#dash-card-holes);
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  filter: drop-shadow(0 12px 26px rgba(6, 22, 26, 0.3));
+  padding: 22px 20px 20px 44px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: transform 0.2s ease, filter 0.2s ease, opacity 0.2s ease;
+}
+.card:hover { transform: translateY(-3px); filter: drop-shadow(0 16px 30px rgba(6, 22, 26, 0.36)); }
+
+/* selection mode: eligible (active) cards invite the click, ineligible
+   ones step back rather than disappear - the user should still see
+   what they threw, just understand it's not choosable right now
+   (matches keep.php's own guard: is_active=1, retirement_reason NULL) */
+.grid.selecting .card { cursor: default; }
+.grid.selecting .card.selectable { cursor: pointer; filter: drop-shadow(0 0 0 3px rgba(230, 166, 60, 0.55)) drop-shadow(0 12px 26px rgba(6, 22, 26, 0.3)); }
+.grid.selecting .card.selectable:hover { transform: translateY(-3px) scale(1.015); }
+.grid.selecting .card:not(.selectable) { opacity: 0.4; }
+
+.card::before {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(90deg, transparent calc(15% - 1px), rgba(196, 90, 92, 0.4) calc(15% - 1px), rgba(196, 90, 92, 0.4) 15%, transparent 15%),
+    radial-gradient(120% 90% at 15% 0%, rgba(255, 255, 255, 0.55), transparent 55%),
+    radial-gradient(140% 100% at 85% 100%, rgba(120, 95, 55, 0.1), transparent 55%);
+  pointer-events: none;
+}
+
+.card-message { position: relative; font-family: Georgia, "Iowan Old Style", "Times New Roman", serif; font-size: 16.5px; line-height: 1.55; color: var(--ink); }
+.card-meta { position: relative; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.card-holds { font-size: 12.5px; color: rgba(6, 40, 44, 0.55); font-variant-numeric: tabular-nums; }
+
+.select-hint {
+  position: relative;
+  align-self: flex-start;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.03em;
+  color: #8a6520;
+}
+
+.empty-state {
+  position: relative; z-index: 5;
+  padding: 80px 6vw;
+  text-align: center;
+  color: rgba(6, 40, 44, 0.6);
+  font-size: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card, .popover, .select-banner { transition: none; }
+}

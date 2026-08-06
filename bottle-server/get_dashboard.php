@@ -5,7 +5,11 @@ include("database/retirement.php");
 
 $user_id = $current_user["id"];
 
-$sql = "SELECT * FROM bottles WHERE author_id = ? AND is_active = 1";
+// includes the user's own history, not just what's still circulating -
+// active (is_active=1) plus anything that completed or was neglected.
+// Deliberately excludes 'kept' (its own dedicated view, get_shelf.php)
+// and 'reported' (silently removed, no dashboard visibility for it).
+$sql = "SELECT * FROM bottles WHERE author_id = ? AND (is_active = 1 OR retirement_reason IN ('completed', 'neglected'))";
 $query = $mysql->prepare($sql);
 $query->bind_param("i", $user_id);
 $query->execute();
@@ -39,9 +43,11 @@ while($bottle = $array->fetch_assoc()) {
     $bottle["marks"] = $marks;
 
     // lazy retirement check: this bottle's is_active flag can be stale
-    // if nothing has touched it since it became due - if it's due now,
-    // retire it and leave it out of this response, since it's no
-    // longer circulating (it'll show up in the archive instead)
+    // if nothing has touched it since it became due. Unlike draw.php/
+    // get_archive.php, a newly-retired bottle here is NOT excluded -
+    // the dashboard shows the user's own Completed/Neglected history
+    // too now, so it belongs in this response with its new status
+    // rather than being dropped.
     $retirement_reason = determine_retirement_reason($bottle, count($marks));
 
     if($retirement_reason !== null){
@@ -49,7 +55,9 @@ while($bottle = $array->fetch_assoc()) {
         $query = $mysql->prepare($sql);
         $query->bind_param("si", $retirement_reason, $bottle_id);
         $query->execute();
-        continue;
+
+        $bottle["is_active"] = 0;
+        $bottle["retirement_reason"] = $retirement_reason;
     }
 
     $response["data"][] = $bottle;

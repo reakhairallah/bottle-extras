@@ -4,17 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bottle - Dashboard</title>
-    <link rel="stylesheet" href="../styles/style.css">
+    <link rel="stylesheet" href="../styles/tokens.css">
+    <link rel="stylesheet" href="../styles/components.css">
+    <link rel="stylesheet" href="../styles/dashboard.css">
 </head>
 <body>
 
-    <nav class="top-bar">
-        <a href="index.html" class="icon-btn" aria-label="Back to main">←</a>
-        <h1 class="page-title">Your Bottles</h1>
+    <!-- own mask, distinct from the archive's #card-holes and the
+         canonical #paper-holes - this card's own proportions -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+        <mask id="dash-card-holes" maskUnits="userSpaceOnUse" x="0" y="0" width="280" height="380">
+            <rect x="0" y="0" width="280" height="380" fill="white" />
+            <circle cx="20" cy="40" r="4.5" fill="black" />
+            <circle cx="20" cy="120" r="4.5" fill="black" />
+            <circle cx="20" cy="200" r="4.5" fill="black" />
+            <circle cx="20" cy="280" r="4.5" fill="black" />
+            <circle cx="20" cy="350" r="4.5" fill="black" />
+        </mask>
+    </svg>
+
+    <div class="scene">
+        <div class="sun-halo"></div>
+        <div class="sun-core"></div>
+    </div>
+    <div class="scrim"></div>
+
+    <nav class="nav-bar compact">
+        <a href="index.html" class="icon-btn" aria-label="Home" title="Home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 11.5 12 4l8 7.5" /><path d="M6 10v9h12v-9" /><path d="M10 19v-5h4v5" />
+            </svg>
+        </a>
+        <div class="nav-divider"></div>
+        <span class="nav-title">Dashboard</span>
+        <div class="nav-divider"></div>
+        <button class="nav-textbtn" id="shelf-btn">Shelf<span class="dot" id="shelf-dot" style="display:none;"></span></button>
+        <button class="nav-textbtn" id="sealed-btn">Sealed<span class="dot" id="sealed-dot" style="display:none;"></span></button>
     </nav>
 
-    <main class="dashboard-list" id="dashboard-list">
-    </main>
+    <div class="select-banner" id="select-banner">
+        <span>Choose one of your bottles below to keep — forever, and only once.</span>
+        <button id="select-cancel">Cancel</button>
+    </div>
+
+    <div class="page-header">
+        <h1>Your Bottles</h1>
+        <p id="counts">Loading…</p>
+    </div>
+
+    <main class="grid" id="grid"></main>
+
+    <div class="popover-backdrop" id="popover-backdrop"></div>
+    <div class="popover glass" id="popover">
+        <div class="popover-content" id="popover-content"></div>
+    </div>
+
+    <div class="toast-stack" id="toast-stack"></div>
 
     <script src="../scripts/axios.min.js"></script>
     <script src="../scripts/env.js"></script>
