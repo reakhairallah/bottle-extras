@@ -16,6 +16,10 @@ $response["success"] = true;
 $response["data"] = [];
 $response["data"]["display_name"] = $current_user["display_name"];
 $response["data"]["can_throw"] = $row["total"] < 3;
+// needed by the ocean's real "viewer position" (see database/position.php) -
+// same seed+age-derived math already used for every bottle's position
+$response["data"]["seed"] = $current_user["seed"];
+$response["data"]["created_at"] = $current_user["created_at"];
 
 echo json_encode($response);
 
