@@ -9,10 +9,14 @@ function closeModal(modal){
 // className defaults to "mark" (the original Phase 1 style) so every
 // existing call site (app.js, dashboard.js) is untouched - new pages
 // that use the shared paper material (styles/components.css) pass
-// "paper-mark" explicitly instead.
+// "paper-mark" explicitly instead. Split on whitespace before handing
+// to classList.add() - a compound className like "paper-mark none"
+// (dashboard.js's empty-marks case) is a single space-containing string,
+// and classList.add() throws on any token containing a space unless
+// each class is passed as its own argument.
 function createMarkElement(text, className = "mark"){
     const mark = document.createElement("p");
-    mark.classList.add(className);
+    mark.classList.add(...className.split(" "));
     mark.textContent = text;
     return mark;
 }
