@@ -513,8 +513,9 @@ postBtn.addEventListener("click", () => {
     });
 });
 
-reportBtn.addEventListener("click", () => {
-    if(!confirm("Are you sure you want to report this bottle?")) return;
+reportBtn.addEventListener("click", async () => {
+    const ok = await confirmDialog("Are you sure you want to report this bottle?", "Report");
+    if(!ok) return;
 
     const body = new URLSearchParams();
     body.append("bottle_id", currentBottleId);

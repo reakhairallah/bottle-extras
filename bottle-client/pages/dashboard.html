@@ -30,16 +30,16 @@
     <div class="scrim"></div>
 
     <nav class="nav-bar compact">
-        <a href="index.html" class="icon-btn" aria-label="Home" title="Home">
+        <a href="game.html" class="icon-btn" aria-label="Back to the game" title="Back to the game">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 11.5 12 4l8 7.5" /><path d="M6 10v9h12v-9" /><path d="M10 19v-5h4v5" />
+                <path d="M15 6l-6 6 6 6" />
             </svg>
         </a>
         <div class="nav-divider"></div>
         <span class="nav-title">Dashboard</span>
         <div class="nav-divider"></div>
-        <button class="nav-textbtn" id="shelf-btn">Shelf<span class="dot" id="shelf-dot" style="display:none;"></span></button>
-        <button class="nav-textbtn" id="sealed-btn">Sealed<span class="dot" id="sealed-dot" style="display:none;"></span></button>
+        <button class="nav-textbtn" id="shelf-btn">Shelf</button>
+        <button class="nav-textbtn" id="sealed-btn">Sealed</button>
     </nav>
 
     <div class="select-banner" id="select-banner">
@@ -60,6 +60,18 @@
     </div>
 
     <div class="toast-stack" id="toast-stack"></div>
+
+    <!-- shared glass confirm dialog (styles/components.css, scripts/helpers.js
+         confirmDialog) - replaces the native window.confirm() for the
+         keep-a-bottle confirmation -->
+    <div class="backdrop" id="confirm-backdrop"></div>
+    <div class="confirm-box" id="confirm-box">
+        <p class="confirm-message" id="confirm-message"></p>
+        <div class="confirm-actions">
+            <button class="paper-link-btn" id="confirm-cancel">Cancel</button>
+            <button class="paper-primary-btn" id="confirm-ok">Confirm</button>
+        </div>
+    </div>
 
     <script src="../scripts/axios.min.js"></script>
     <script src="../scripts/env.js"></script>

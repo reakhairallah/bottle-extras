@@ -172,6 +172,56 @@
 }
 .backdrop.open { opacity: 1; pointer-events: auto; }
 
+/* ================= CONFIRM DIALOG =================
+   Stylized replacement for the native window.confirm() - a "you sure?"
+   prompt is chrome (a system-level yes/no), not message content, so it
+   gets the glass material (same recipe as the nav pill and dashboard's
+   popover.glass: rgba(255,255,255,0.72), blur(14px) saturate(140%))
+   rather than the paper's. Pair with a page's own .backdrop element
+   (own id, e.g. #confirm-backdrop - don't reuse a page's #backdrop/
+   #throw-backdrop, since those may need to stay closed/open
+   independently) and helpers.js's confirmDialog(message), which wires
+   this generically via shared #confirm-backdrop/#confirm-box/
+   #confirm-message/#confirm-cancel/#confirm-ok ids. Unlike the draw/
+   throw modal's backdrop, clicking this one DOES cancel - a yes/no
+   prompt has no typed content to protect, so it's harmless to dismiss
+   and re-trigger. */
+.confirm-box {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 30;
+  width: min(90vw, 360px);
+  padding: 24px 24px 20px;
+  border-radius: 18px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: 0 16px 40px rgba(6, 40, 44, 0.28);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.94);
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.confirm-box.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+.confirm-message {
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink);
+  margin-bottom: 18px;
+}
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 18px;
+}
+
 /* ================= PAPER (canonical, full-size) =================
    The draw modal and throw modal use this exact recipe - a thrown
    bottle and a drawn one are the same physical object, just at
@@ -397,7 +447,7 @@
 .toast-dismiss:hover { opacity: 1; }
 
 @media (prefers-reduced-motion: reduce) {
-  .sun-halo, .sun-core, .icon-btn, .nav-textbtn, .backdrop, .paper, .paper-content, .paper-primary-btn, .toast {
+  .sun-halo, .sun-core, .icon-btn, .nav-textbtn, .backdrop, .paper, .paper-content, .paper-primary-btn, .toast, .confirm-box {
     transition: none;
     animation: none;
   }

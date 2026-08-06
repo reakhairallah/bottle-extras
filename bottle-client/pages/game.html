@@ -3,65 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bottle</title>
-    <link rel="stylesheet" href="../styles/style.css">
+    <title>Bottle - Ocean</title>
+    <link rel="stylesheet" href="../styles/tokens.css">
+    <link rel="stylesheet" href="../styles/components.css">
+    <link rel="stylesheet" href="../styles/game.css">
 </head>
 <body>
 
-    <nav class="top-bar">
-        <a href="dashboard.html" class="icon-btn" id="profile-btn" aria-label="Your dashboard">👤</a>
-        <h2 id="welcome-msg">Welcome</h2>
-        <button class="icon-btn" id="add-btn" aria-label="Throw a bottle">✚</button>
+    <div class="scene">
+        <div class="sun-halo"></div>
+        <div class="sun-core"></div>
+
+        <svg class="cloud cloud-a" viewBox="0 0 200 100" aria-hidden="true">
+            <ellipse cx="100" cy="70" rx="86" ry="24" /><circle cx="72" cy="46" r="32" /><circle cx="128" cy="44" r="30" />
+        </svg>
+        <svg class="cloud cloud-b" viewBox="0 0 200 100" aria-hidden="true">
+            <ellipse cx="100" cy="70" rx="80" ry="22" /><circle cx="98" cy="42" r="32" />
+        </svg>
+        <svg class="cloud cloud-c" viewBox="0 0 200 100" aria-hidden="true">
+            <ellipse cx="100" cy="70" rx="82" ry="22" /><circle cx="88" cy="44" r="30" /><circle cx="136" cy="48" r="24" />
+        </svg>
+        <svg class="cloud cloud-d" viewBox="0 0 200 100" aria-hidden="true">
+            <ellipse cx="100" cy="70" rx="78" ry="22" /><circle cx="104" cy="44" r="30" />
+        </svg>
+
+        <div class="bird bird-1"><svg width="16" height="6" viewBox="0 0 16 6" aria-hidden="true"><path d="M1 5 Q8 0.5 15 5" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" /></svg></div>
+        <div class="bird bird-2"><svg width="16" height="6" viewBox="0 0 16 6" aria-hidden="true"><path d="M1 5 Q8 0.5 15 5" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" /></svg></div>
+        <div class="bird bird-3"><svg class="bird-flap" width="16" height="6" viewBox="0 0 16 6" aria-hidden="true"><path d="M1 5 Q8 0.5 15 5" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" /></svg></div>
+        <div class="bird bird-4"><svg class="bird-flap" width="13" height="5" viewBox="0 0 16 6" aria-hidden="true"><path d="M1 5 Q8 0.5 15 5" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" /></svg></div>
+
+        <canvas id="ocean"></canvas>
+    </div>
+
+    <!-- gradients shared by every bottle instance -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+        <defs>
+            <linearGradient id="bottle-glass" x1="15%" y1="10%" x2="85%" y2="95%">
+                <stop offset="0%" stop-color="#9fcaa6" /><stop offset="45%" stop-color="#5f8f6e" /><stop offset="100%" stop-color="#375c47" />
+            </linearGradient>
+            <linearGradient id="bottle-cork" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#d8b483" /><stop offset="100%" stop-color="#b98c54" />
+            </linearGradient>
+        </defs>
+    </svg>
+
+    <!-- shared with the draw modal - see styles/components.css .paper -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+        <mask id="paper-holes" maskUnits="userSpaceOnUse" x="0" y="0" width="420" height="460">
+            <rect x="0" y="0" width="420" height="460" fill="white" />
+            <circle cx="22" cy="30" r="5" fill="black" /><circle cx="22" cy="70" r="5" fill="black" />
+            <circle cx="22" cy="110" r="5" fill="black" /><circle cx="22" cy="150" r="5" fill="black" />
+            <circle cx="22" cy="190" r="5" fill="black" /><circle cx="22" cy="230" r="5" fill="black" />
+            <circle cx="22" cy="270" r="5" fill="black" /><circle cx="22" cy="310" r="5" fill="black" />
+            <circle cx="22" cy="350" r="5" fill="black" /><circle cx="22" cy="390" r="5" fill="black" />
+            <circle cx="22" cy="430" r="5" fill="black" />
+        </mask>
+    </svg>
+
+    <div id="bottle-slots"></div>
+
+    <div class="cork" id="cork"><svg viewBox="0 0 30 18" aria-hidden="true">
+        <rect x="0" y="0" width="30" height="18" rx="5" fill="#d8b483" stroke="#8a6a3d" stroke-width="1" />
+        <line x1="6" y1="4" x2="6" y2="14" stroke="#8a6a3d" stroke-width="1" opacity="0.6" />
+        <line x1="15" y1="3" x2="15" y2="15" stroke="#8a6a3d" stroke-width="1" opacity="0.6" />
+        <line x1="24" y1="4" x2="24" y2="14" stroke="#8a6a3d" stroke-width="1" opacity="0.6" />
+    </svg></div>
+    <div class="puff" id="puff"></div>
+
+    <div class="backdrop" id="backdrop"></div>
+    <div class="paper" id="paper">
+        <div class="paper-content">
+            <p class="paper-message" id="paper-message"></p>
+            <span class="paper-marks-label">Marks</span>
+            <div class="paper-marks" id="paper-marks"></div>
+            <textarea class="paper-textarea" id="mark-textarea" maxlength="100" placeholder="Leave a mark..."></textarea>
+            <p class="paper-char-count"><span id="mark-char-count">0</span>/100</p>
+            <div class="paper-actions">
+                <button class="paper-link-btn" id="report-btn">⚠︎ Report</button>
+                <button class="paper-link-btn" id="close-bottle-btn">Close</button>
+                <button class="paper-primary-btn" id="post-mark-btn">Post</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- THROW MODAL - the exact same shared .paper as the draw modal
+         above (styles/components.css), grown from the nav's + button's
+         own rect instead of a standing bottle's neck. A separate
+         backdrop/paper pair from the draw modal's, since both can exist
+         in the DOM at once (guarded in game.js so only one is ever open
+         at a time). -->
+    <div class="backdrop" id="throw-backdrop"></div>
+    <div class="paper" id="throw-paper">
+        <div class="paper-content">
+            <span class="paper-label">New Bottle</span>
+            <textarea class="throw-textarea" id="throw-textarea" maxlength="255" placeholder="Write something you'd never say out loud..."></textarea>
+            <span class="char-count" id="throw-char-count">0 / 255</span>
+
+            <div class="seal-row">
+                <div>
+                    <div class="seal-label">Seal until a future date</div>
+                    <div class="seal-hint">It can't be drawn by anyone until then.</div>
+                </div>
+                <button class="toggle" id="seal-toggle" aria-label="Seal this bottle"></button>
+            </div>
+            <div class="seal-date-row" id="seal-date-row">
+                <input type="date" id="seal-date" />
+            </div>
+
+            <div class="paper-actions">
+                <button class="paper-link-btn" id="throw-cancel">Cancel</button>
+                <button class="paper-primary-btn" id="throw-submit" disabled>Throw</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-stack" id="toast-stack"></div>
+
+    <!-- shared glass confirm dialog (styles/components.css, scripts/helpers.js
+         confirmDialog) - replaces the native window.confirm() for the
+         report button below -->
+    <div class="backdrop" id="confirm-backdrop"></div>
+    <div class="confirm-box" id="confirm-box">
+        <p class="confirm-message" id="confirm-message"></p>
+        <div class="confirm-actions">
+            <button class="paper-link-btn" id="confirm-cancel">Cancel</button>
+            <button class="paper-primary-btn" id="confirm-ok">Confirm</button>
+        </div>
+    </div>
+
+    <nav class="nav-bar">
+        <span class="welcome-text" id="welcome-msg">Welcome</span>
+        <div class="nav-divider"></div>
+        <a href="index.html" class="icon-btn" aria-label="Home" title="Home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 11.5 12 4l8 7.5" /><path d="M6 10v9h12v-9" /><path d="M10 19v-5h4v5" />
+            </svg>
+        </a>
+        <a href="dashboard.html" class="icon-btn" aria-label="Your dashboard" title="Dashboard">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8.2" r="3.4" /><path d="M5.3 19.5c1.15-3.4 3.85-5.1 6.7-5.1s5.55 1.7 6.7 5.1" />
+            </svg>
+        </a>
+        <button class="icon-btn primary" id="add-btn" aria-label="Throw a bottle" title="Throw a bottle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14" /></svg>
+        </button>
     </nav>
-
-    <main class="bottle-grid">
-        <button class="bottle-card"></button>
-        <button class="bottle-card"></button>
-        <button class="bottle-card"></button>
-        <button class="bottle-card"></button>
-        <button class="bottle-card"></button>
-        <button class="bottle-card"></button>
-    </main>
-
-    <!-- THROW MODAL -->
-
-    <div class="modal-backdrop hidden" id="throw-modal">
-        <div class="modal-box">
-            <h2>Throw a bottle</h2>
-            <textarea class="text-input" id="throw-textarea" maxlength="255" placeholder="Write your message..."></textarea>
-            <p class="char-num"><span id="throw-char-count">0</span>/255</p>
-            <div class="modal-actions">
-                <button class="cancel-btn" id="cancel-btn">Cancel</button>
-                <button class="submit-btn" id="throw-btn">Throw</button>
-            </div>
-        </div>
-    </div>
-
-    <!--DRAW MODAL-->
-
-    <div class="modal-backdrop hidden" id="draw-modal">
-        <div class="modal-box">
-            <p class="bottle-content" id="bottle-content">This is the bottle's message text.</p>
-
-            <div class="marks-list" id="marks-list">
-                <p class="mark">a line someone left</p>
-                <p class="mark">another line</p>
-            </div>
-
-            <textarea class="text-input" id="mark-textarea" maxlength="100" placeholder="Leave a mark..."></textarea>
-            <p class="char-num"><span id="mark-char-count">0</span>/100</p>
-
-            <div class="modal-actions">
-                <button id="report-btn">⚠︎ Report</button>
-                <button class="cancel-btn" id="close-bottle-btn">Close</button>
-                <button class="submit-btn" id="post-mark-btn">Post</button>
-            </div>
-        </div>
-    </div>
 
     <script src="../scripts/axios.min.js"></script>
     <script src="../scripts/env.js"></script>
     <script src="../scripts/helpers.js"></script>
-    <script src="../scripts/app.js"></script>
+    <script src="../scripts/game.js"></script>
 </body>
 </html>

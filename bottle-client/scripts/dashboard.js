@@ -108,8 +108,6 @@ function loadDashboard(){
         keptBottle = shelfRes.data.data ? mapBottle(shelfRes.data.data) : null;
         if(keptBottle) keptBottle.reason = "kept";
 
-        document.getElementById("shelf-dot").style.display = keptBottle ? "inline-block" : "none";
-        document.getElementById("sealed-dot").style.display = SEALED.length ? "inline-block" : "none";
 
         renderCounts();
         renderGrid();
@@ -139,12 +137,10 @@ function stopSelecting(){
     renderGrid();
 }
 
-function confirmKeep(bottle, card){
-    // a real polished build would use an in-world confirm dialog rather
-    // than the browser's own confirm() - the choice logic is the point
-    // here, not the confirm chrome
+async function confirmKeep(bottle, card){
     const excerpt = bottle.message.length > 60 ? bottle.message.slice(0, 60) + "…" : bottle.message;
-    if(!window.confirm(`Keep "${excerpt}" forever? This can only be done once, and it leaves circulation immediately.`)) return;
+    const ok = await confirmDialog(`Keep "${excerpt}" forever? This can only be done once, and it leaves circulation immediately.`, "Keep it");
+    if(!ok) return;
 
     card.style.transition = "opacity 0.25s ease, transform 0.25s ease";
     card.style.opacity = "0";
@@ -281,7 +277,7 @@ function renderSealedPopover(){
         const rows = SEALED
             .slice()
             .sort((a, b) => a.unlocksAt - b.unlocksAt)
-            .map((s, i) => `<div class="sealed-row"><span>#${i + 1}</span><span class="when">in ${monthsAway(s.unlocksAt)} months · ${fmt(s.unlocksAt)}</span></div>`)
+            .map((s, i) => `<div class="sealed-row"><span>${i + 1}</span><span class="when">in ${monthsAway(s.unlocksAt)} months · ${fmt(s.unlocksAt)}</span></div>`)
             .join("");
         html =
             `<span class="popover-title">${SEALED.length} bottle${SEALED.length === 1 ? "" : "s"} sealed</span>` +

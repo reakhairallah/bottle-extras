@@ -12,7 +12,11 @@ html, body {
 
 body {
   position: relative;
-  background: linear-gradient(180deg, var(--sky-high) 0%, var(--sky-horizon) 40%, var(--water-shallow) 42%, var(--water-deep) 100%);
+  /* waterline matched to landing.css/game.css's 62%/63% - was 40%/42%,
+     an independent drift from those pages (same kind of gap as the sun
+     position bug noted above) that left water covering ~58% of the
+     screen instead of ~37%. Static value only, no canvas/animation. */
+  background: linear-gradient(180deg, var(--sky-high) 0%, var(--sky-horizon) 62%, var(--water-shallow) 63%, var(--water-deep) 100%);
 }
 
 /* ================= SCENE ================= */

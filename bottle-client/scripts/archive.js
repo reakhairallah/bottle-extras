@@ -51,7 +51,7 @@ axios.get(BASE_URL + "get_archive.php").then((response) => {
         grid.appendChild(card);
     });
 }).catch((error) => {
-    alert("Something went wrong loading the archive: " + error.message);
+    showToast("error", "Something went wrong loading the archive: " + error.message);
 });
 
 // ============================================================
