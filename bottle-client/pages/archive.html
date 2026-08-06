@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bottle - Archive</title>
+    <link rel="stylesheet" href="../styles/tokens.css">
+    <link rel="stylesheet" href="../styles/components.css">
+    <link rel="stylesheet" href="../styles/archive.css">
+</head>
+<body>
+
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+        <mask id="card-holes" maskUnits="userSpaceOnUse" x="0" y="0" width="220" height="220">
+            <rect x="0" y="0" width="220" height="220" fill="white" />
+            <circle cx="17" cy="40" r="4" fill="black" />
+            <circle cx="17" cy="110" r="4" fill="black" />
+            <circle cx="17" cy="180" r="4" fill="black" />
+        </mask>
+    </svg>
+
+    <!-- shared with the draw/throw modal - see styles/components.css .paper -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+        <mask id="paper-holes" maskUnits="userSpaceOnUse" x="0" y="0" width="420" height="460">
+            <rect x="0" y="0" width="420" height="460" fill="white" />
+            <circle cx="22" cy="30" r="5" fill="black" /><circle cx="22" cy="70" r="5" fill="black" />
+            <circle cx="22" cy="110" r="5" fill="black" /><circle cx="22" cy="150" r="5" fill="black" />
+            <circle cx="22" cy="190" r="5" fill="black" /><circle cx="22" cy="230" r="5" fill="black" />
+            <circle cx="22" cy="270" r="5" fill="black" /><circle cx="22" cy="310" r="5" fill="black" />
+            <circle cx="22" cy="350" r="5" fill="black" /><circle cx="22" cy="390" r="5" fill="black" />
+            <circle cx="22" cy="430" r="5" fill="black" />
+        </mask>
+    </svg>
+
+    <div class="scene">
+        <div class="sun-halo"></div>
+        <div class="sun-core"></div>
+    </div>
+    <div class="scrim"></div>
+
+    <nav class="nav-bar compact">
+        <a href="index.html" class="icon-btn" aria-label="Home" title="Home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 11.5 12 4l8 7.5" /><path d="M6 10v9h12v-9" /><path d="M10 19v-5h4v5" />
+            </svg>
+        </a>
+        <div class="nav-divider"></div>
+        <span class="nav-title">Archive</span>
+    </nav>
+
+    <div class="page-header">
+        <h1>The Archive</h1>
+        <p id="counts">Loading…</p>
+    </div>
+
+    <main class="grid" id="grid"></main>
+
+    <div class="backdrop" id="backdrop"></div>
+    <div class="paper" id="paper">
+        <div class="paper-content">
+            <p class="paper-message" id="paper-message"></p>
+            <span class="paper-marks-label">Marks</span>
+            <div class="paper-marks" id="paper-marks"></div>
+            <div class="paper-actions">
+                <span class="status-tag" id="paper-tag"></span>
+                <button class="paper-link-btn" id="paper-close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../scripts/axios.min.js"></script>
+    <script src="../scripts/env.js"></script>
+    <script src="../scripts/helpers.js"></script>
+    <script src="../scripts/archive.js"></script>
+</body>
+</html>
