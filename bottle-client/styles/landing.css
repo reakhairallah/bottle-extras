@@ -1,0 +1,151 @@
+/* ============================================================
+   LANDING PAGE (index.html) - page-specific only.
+   Palette + reset come from tokens.css. Nothing here is shared with
+   another page - no nav, no paper, no status tags, so components.css
+   isn't loaded on this page at all.
+   ============================================================ */
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  position: relative;
+  background: linear-gradient(180deg, var(--sky-high) 0%, var(--sky-horizon) 62%, var(--water-shallow) 63%, var(--water-deep) 100%);
+}
+
+/* ================= SCENE: the same ocean background as the ocean
+   stage (sun/clouds/birds/waves), minus bottles - blurred and slightly
+   oversized so the blur never reveals a sharp edge, dimmed a touch so
+   the panel reads clearly on top. This is the "front door": the user
+   should recognize the world before ever seeing a bottle in focus. ================= */
+.scene {
+  position: absolute;
+  inset: -20px;
+  filter: blur(13px);
+}
+
+/* sun-halo/sun-core/sun-breathe now live in components.css, shared
+   across every page that shows the sun - see that file's note on why
+   this was promoted out of per-page duplication. */
+
+.cloud { position: absolute; fill: rgba(255, 255, 255, 0.58); pointer-events: none; }
+.cloud-a { left: 12%; top: 44%; width: min(15vw, 138px); }
+.cloud-b { left: 34%; top: 11%; width: min(7vw, 64px); opacity: 0.5; }
+.cloud-c { left: 84%; top: 36%; width: min(11vw, 100px); opacity: 0.65; }
+.cloud-d { left: 64%; top: 53%; width: min(8vw, 74px); opacity: 0.55; }
+
+.bird { position: absolute; color: var(--ink); }
+.bird svg { display: block; }
+.bird-flap { animation: bird-flap 1.1s ease-in-out infinite; transform-origin: center; }
+@keyframes bird-flap { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.72); } }
+.bird-1 { left: 21%; top: 21%; opacity: 0.45; }
+.bird-2 { left: 44%; top: 8%; opacity: 0.32; transform: scale(0.75); }
+.bird-3 { left: 71%; top: 17%; opacity: 0.55; animation: bird-drift 42s ease-in-out infinite; }
+.bird-4 { left: 75%; top: 20.5%; opacity: 0.42; animation: bird-drift 42s ease-in-out infinite -3s; }
+@keyframes bird-drift {
+  0%   { transform: translate(0, 0); }
+  50%  { transform: translate(8vw, -1.4vh); }
+  100% { transform: translate(0, 0); }
+}
+
+canvas#ocean { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* soft warm-to-deep wash on top of the blurred scene, matching the
+   backdrop tint used everywhere else in the app - just enough to lift
+   the panel's contrast without flattening the ocean into a solid color */
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 90% at 50% 38%, rgba(6, 40, 44, 0.06), rgba(6, 40, 44, 0.22) 100%);
+  pointer-events: none;
+}
+
+/* ================= FRONT DOOR PANEL ================= */
+.panel {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 34px;
+  width: min(90vw, 420px);
+}
+
+.wordmark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+.wordmark h1 {
+  font-size: clamp(34px, 7vw, 46px);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  text-shadow: 0 2px 18px rgba(255, 255, 255, 0.35);
+}
+.wordmark p {
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: rgba(6, 40, 44, 0.78);
+  max-width: 34ch;
+  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.3);
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+/* same glass language as the nav pill: translucent white, blurred, a
+   hairline border catching the light, a soft ink-tinted shadow to lift
+   it off the water rather than a hard drop-shadow. These are real
+   links (<a href>), not buttons+JS - plain navigation needs nothing
+   more, and a token-creating first request happens naturally the
+   moment game.html/archive.html loads and calls its own API. `display:
+   block` is required here since .cta's width:100% only works on a
+   block-level element - an inline <a> would otherwise ignore it. */
+.cta {
+  display: block;
+  width: 100%;
+  padding: 18px 26px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  box-shadow: 0 4px 16px rgba(6, 40, 44, 0.14);
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+.cta:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(6, 40, 44, 0.18); }
+.cta:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+/* primary: brighter glass, like the nav's .icon-btn.primary treatment -
+   the more-committed action (starting to play) reads as the brighter
+   surface */
+.cta-primary { background: rgba(255, 255, 255, 0.62); }
+.cta-primary:hover { background: rgba(255, 255, 255, 0.82); }
+
+/* secondary: quieter glass - browsing the archive is the lower-
+   commitment, exploratory action */
+.cta-secondary { background: rgba(255, 255, 255, 0.34); }
+.cta-secondary:hover { background: rgba(255, 255, 255, 0.5); }
+
+@media (prefers-reduced-motion: reduce) {
+  /* sun-halo/sun-core handled in components.css's own reduced-motion block */
+  .bird-3, .bird-4, .bird-flap, .cta { animation: none; transition: none; }
+}

@@ -1,0 +1,38 @@
+/* ============================================================
+   DESIGN TOKENS + BASE RESET
+   Shared across every page. Palette values are the Step 1 locked
+   decision from CLAUDE.md - don't hand-pick a color elsewhere in the
+   app when one of these already means it.
+   ============================================================ */
+
+:root {
+  --sky-high: #cdeaf7;
+  --sky-horizon: #9bd2e8;
+  --water-shallow: #1f7fa0;
+  --water-deep: #0a3b52;
+  --foam: #eaf7fb;
+  --ink: #06282c;
+  --glass: rgba(255, 255, 255, 0.5);
+  --glass-border: rgba(255, 255, 255, 0.75);
+  --paper: #f4eed9;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: var(--ink);
+}
+
+/* the confession/message itself gets a distinct serif treatment
+   everywhere it appears (draw modal, throw modal, archive/dashboard
+   cards) - meant to read like a personal letter, not app copy. Kept
+   here rather than duplicated per page since it's a single, consistent
+   typographic decision, not a layout one. */
+.serif-message {
+  font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+}

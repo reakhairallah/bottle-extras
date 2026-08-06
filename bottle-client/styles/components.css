@@ -1,0 +1,418 @@
+/* ============================================================
+   SHARED COMPONENTS
+   Anything used identically on 2+ pages lives here. Page-specific
+   layout (scene/scrim, grids, popovers, page-header, cork/puff, throw
+   form fields) stays in each page's own stylesheet - see the "Not
+   here on purpose" note at the bottom.
+
+   Depends on styles/tokens.css being loaded first (uses --ink, --glass,
+   --glass-border, --paper).
+   ============================================================ */
+
+/* ================= SUN =================
+   Step 1 locked position/size/animation - identical on every page that
+   shows it (landing, archive, dashboard, game). Promoted here after
+   archive/dashboard independently drifted to a different position/size
+   and silently lost the breathing animation entirely - duplicating
+   this per page is exactly how that happened, so it lives here now
+   instead of being re-typed per page. Each page still owns its own
+   .scene wrapper (position/blur differ by layout - fixed vs absolute,
+   13px vs 15px blur), just not the sun itself. */
+.sun-halo {
+  position: absolute; left: 54%; top: 23%;
+  width: min(33vw, 300px); height: min(33vw, 300px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 240, 200, 0.9) 0%, rgba(255, 219, 140, 0.5) 35%, rgba(255, 219, 140, 0) 72%);
+  animation: sun-breathe 8s ease-in-out infinite;
+}
+.sun-core {
+  position: absolute; left: 54%; top: 23%;
+  width: min(13vw, 120px); height: min(13vw, 120px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, #fffaf0 0%, #ffe6ac 45%, rgba(255, 214, 140, 0) 78%);
+  animation: sun-breathe 8s ease-in-out infinite;
+}
+@keyframes sun-breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.88; }
+}
+
+/* ================= NAV PILL =================
+   One merged glass pill, always visible. Two variants:
+   - default: welcome text + full-size (44px) icon buttons - the
+     in-game nav (game.html, and the throw modal preview).
+   - .compact: reduced (34px) icon buttons + a text title, used where
+     the nav carries fewer/lighter elements (archive.html,
+     dashboard.html) - the full size read as oversized there (a fix
+     applied after the archive page shipped, see CLAUDE.md). */
+.nav-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px 8px 20px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  box-shadow: 0 4px 16px rgba(6, 40, 44, 0.14);
+}
+.nav-bar.compact {
+  gap: 6px;
+  padding: 6px 16px 6px 6px;
+}
+
+.welcome-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+  padding-right: 4px;
+}
+.nav-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+  padding: 0 6px;
+}
+
+.nav-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(6, 40, 44, 0.18);
+  flex-shrink: 0;
+}
+.nav-bar.compact .nav-divider { height: 20px; }
+
+.icon-btn {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  text-decoration: none;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.icon-btn:hover { background: rgba(255, 255, 255, 0.65); transform: scale(1.06); }
+.icon-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.icon-btn svg { width: 20px; height: 20px; }
+/* the more-committed action (e.g. Throw) reads as the brighter glass
+   surface - same logic the landing page's primary button borrows */
+.icon-btn.primary { background: rgba(255, 255, 255, 0.5); }
+.icon-btn.primary:hover { background: rgba(255, 255, 255, 0.75); }
+
+.nav-bar.compact .icon-btn { width: 34px; height: 34px; }
+.nav-bar.compact .icon-btn svg { width: 16px; height: 16px; }
+
+/* plain-text nav buttons (Shelf, Sealed) - no icon reads clearly for
+   either concept at this size, so these are just words in a quiet pill
+   rather than the circular icon buttons */
+.nav-textbtn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+.nav-textbtn:hover, .nav-textbtn.active-btn { background: rgba(255, 255, 255, 0.65); }
+.nav-textbtn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+/* a small dot marks a nav-textbtn's target as non-empty (shelf
+   occupied, sealed count > 0) without needing to open it */
+.nav-textbtn .dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #8a6520;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+/* ================= HINT PILL =================
+   Small ambient instruction text (e.g. "Click any bottle to draw it") -
+   same ink-glass material as a success toast, on purpose, since both
+   are "the game quietly telling you something." */
+.hint {
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(6, 40, 44, 0.55);
+  color: var(--paper);
+  font-size: 13px;
+  backdrop-filter: blur(6px);
+}
+
+/* ================= BACKDROP =================
+   Dims the scene behind an open modal/paper. Deliberately NOT wired to
+   close anything by default - both the draw modal and the throw modal
+   are one-shot/easy-to-lose actions, so only an explicit Close/Cancel
+   button dismisses them (see game.js). A lower-stakes popover (Shelf,
+   Sealed) is free to wire its own backdrop click to close, since
+   re-opening those is harmless. */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 22, 26, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.backdrop.open { opacity: 1; pointer-events: auto; }
+
+/* ================= PAPER (canonical, full-size) =================
+   The draw modal and throw modal use this exact recipe - a thrown
+   bottle and a drawn one are the same physical object, just at
+   opposite ends of its life, so they read as the same object. Archive/
+   dashboard cards use a related but independently-sized variant (their
+   own smaller clip-path/mask, since the vertex counts and hole
+   placement are tuned per card size) - see archive.css/dashboard.css.
+
+   Needs a page-local #paper-holes mask def (11 holes, viewBox
+   420x460) and a .paper element positioned by page-specific JS (grows
+   from wherever it was triggered - a bottle's neck, a nav button's
+   rect - to this canonical centered size). */
+.paper {
+  position: fixed;
+  z-index: 16;
+  background: linear-gradient(155deg, #fbf8f0 0%, #f6f1e2 45%, #ece3cd 100%);
+  clip-path: polygon(
+    0% 0%, 100% 0%, 100% 100%, 0% 100%,
+    4% 93%, 0.5% 86%, 3.5% 79%, 1% 72%, 4% 65%, 0% 58%, 3.5% 51%, 1% 44%, 4% 37%, 0.5% 30%, 3.5% 23%, 1% 16%, 4% 9%
+  );
+  mask-image: url(#paper-holes);
+  -webkit-mask-image: url(#paper-holes);
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  filter: drop-shadow(0 18px 40px rgba(6, 22, 26, 0.35));
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    left 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    top 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.25s ease;
+}
+.paper.open { opacity: 1; pointer-events: auto; }
+
+/* single red margin line + a soft light-source highlight/warm vignette
+   - explicitly NOT ruled/lined (tried and removed, see CLAUDE.md) */
+.paper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent calc(16% - 1px), rgba(196, 90, 92, 0.4) calc(16% - 1px), rgba(196, 90, 92, 0.4) 16%, transparent 16%),
+    radial-gradient(120% 90% at 15% 0%, rgba(255, 255, 255, 0.55), transparent 55%),
+    radial-gradient(140% 100% at 85% 100%, rgba(120, 95, 55, 0.1), transparent 55%);
+  pointer-events: none;
+}
+
+.paper-content {
+  position: absolute;
+  inset: 0;
+  padding: 28px 26px 26px 78px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.paper.open .paper-content { opacity: 1; transition: opacity 0.35s ease 0.3s; }
+
+.paper-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(6, 40, 44, 0.45);
+}
+
+.paper-message {
+  font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+  font-size: 19px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.paper-marks-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(6, 40, 44, 0.45);
+}
+.paper-marks {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+/* plain text, no box/card/border/shadow - a bordered mark read as "a
+   website component," undermining the paper metaphor. Just separate
+   handwritten-feeling lines with generous line-gap. */
+.paper-mark {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: rgba(6, 40, 44, 0.72);
+}
+.paper-mark.none {
+  font-style: italic;
+  color: rgba(6, 40, 44, 0.4);
+}
+
+/* the field a user types INTO (a mark, a new bottle) stays in the
+   plain sans - the serif treatment is reserved for a message once it's
+   actually being read, not the raw input control */
+.paper-textarea {
+  width: 100%;
+  height: 64px;
+  resize: none;
+  border: 1px solid rgba(6, 40, 44, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 10px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--ink);
+}
+
+.paper-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.paper-link-btn {
+  border: none;
+  background: none;
+  color: rgba(6, 40, 44, 0.6);
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.paper-primary-btn {
+  border: none;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+.paper-primary-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ================= STATUS TAGS =================
+   Semantic status color, kept separate from the app's own accent
+   hues - four readings of the same ink/water/gold palette:
+   - active    = gold  - the bottle is still out there, still "live"
+   - completed = warm ink/red - it reached its full arc, 3 marks
+   - neglected = cool teal - it just drifted off, no event to mark
+   - kept      = sea-glass green - matches the bottle sprite's own
+     glass color, since this status is about the object itself (a
+     souvenir), not an event that happened to it.
+   The archive only ever uses completed/neglected (it never shows
+   active or kept bottles); dashboard uses all four. */
+.status-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 999px;
+}
+.status-tag.active { background: rgba(230, 166, 60, 0.18); color: #8a6520; }
+.status-tag.completed { background: rgba(196, 90, 92, 0.14); color: #8a3f41; }
+.status-tag.neglected { background: rgba(31, 127, 160, 0.14); color: #1c5c73; }
+.status-tag.kept { background: rgba(95, 143, 110, 0.18); color: #375c47; }
+
+/* ================= TOASTS =================
+   Extends the .hint pill's own ink-glass language with two states
+   rather than inventing a new component family. Success reuses the
+   hint's look; error/limit uses a warm coral - a deliberate new
+   semantic use of the palette's warm hue, kept visually distinct from
+   .status-tag's muted "completed" red (different context: a toast is
+   transient chrome, a status tag is permanent card content) so the two
+   reds don't quietly collide in meaning. */
+.toast-stack {
+  position: fixed;
+  top: 84px;
+  left: 50%;
+  z-index: 40;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 16px 11px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 22px rgba(6, 40, 44, 0.22);
+  opacity: 0;
+  transform: translateY(-14px) scale(0.96);
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: auto;
+  max-width: min(90vw, 380px);
+}
+.toast.in { opacity: 1; transform: translateY(0) scale(1); }
+.toast.success { background: rgba(6, 40, 44, 0.86); color: var(--paper); }
+.toast.error { background: rgba(196, 90, 92, 0.92); color: #fff6f2; }
+.toast-dismiss {
+  border: none;
+  background: none;
+  color: inherit;
+  opacity: 0.7;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+.toast-dismiss:hover { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sun-halo, .sun-core, .icon-btn, .nav-textbtn, .backdrop, .paper, .paper-content, .paper-primary-btn, .toast {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* ================= NOT HERE ON PURPOSE =================
+   Page-specific, left in each page's own stylesheet:
+   - .scene wrapper + .scrim + waves canvas (position/blur vary per
+     page's layout - fixed vs absolute, 13px vs 15px blur - but the sun
+     itself is shared above, not re-typed per page anymore)
+   - cork/puff (only ever appears in the draw-modal open sequence,
+     game.html)
+   - .grid, .card (archive/dashboard each define their own clip-path/
+     mask sized to their own card dimensions - not identical enough to
+     share one rule)
+   - .page-header, popovers, select-banner, seal-toggle/char-count
+     (single-page concerns)
+   ============================================================ */
